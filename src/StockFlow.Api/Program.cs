@@ -1,3 +1,5 @@
+using StockFlow.Application.Products;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,8 @@ builder.Services.AddOpenApi();
 
 // customize the application configuration
 builder.Services.AddControllers();
+// 有transient, scoped, singleton分別
+builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
