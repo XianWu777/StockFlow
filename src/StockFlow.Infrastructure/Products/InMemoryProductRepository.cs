@@ -1,0 +1,46 @@
+using StockFlow.Application.Products;
+
+namespace StockFlow.Infrastructure.Products;
+
+public sealed class InMemoryProductRepository : IProductRepository
+{
+    private readonly List<ProductResponse> _products = [
+        new (
+            Guid.NewGuid(),
+            "Mechanical Keyboard",
+            "A mechanical keyboard",
+            2990m,
+            true
+        ),
+        new (
+            Guid.NewGuid(),
+            "Gaming Mouse",
+            "A gaming mouse",
+            1590m,
+            true
+        )
+    ];
+
+    public Task<IReadOnlyList<ProductResponse>> GetAllAsync(
+        CancellationToken cancellationToken)
+    {
+        IReadOnlyList<ProductResponse> p = new List<ProductResponse> {
+            new (
+                Guid.NewGuid(),
+                "Mechanical Keyboard",
+                "A mechanical keyboard",
+                2990m,
+                true
+            ),
+            new (
+                Guid.NewGuid(),
+                "Gaming Mouse",
+                "A gaming mouse",
+                1590m,
+                true
+            )
+        };
+        // IReadOnlyList<ProductResponse> products = _products;
+        return Task.FromResult(p);
+    }
+}

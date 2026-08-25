@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using StockFlow.Application.Products;
+using StockFlow.Infrastructure.Data;
+using StockFlow.Infrastructure.Entity;
+using StockFlow.Infrastructure.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +14,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 // 有transient, scoped, singleton分別
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IProductRepository, EfProductRepository>();
+builder.Services.AddDbContext<StockFlowDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// builder.Services.AddScoped<IProductRepository, InMemoryProductRepository>();
 
 var app = builder.Build();
 

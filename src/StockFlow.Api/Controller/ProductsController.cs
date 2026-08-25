@@ -19,17 +19,10 @@ namespace StockFlow.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<IActionResult> GetProducts()
         {
-            return Ok(new[]
-            {
-               new
-               {
-                    Id=1,
-                    Name="Product 1",
-                    Price=10.99m
-               } 
-            });
+            var a = await _productService.GetAllAsync(CancellationToken.None);
+            return Ok(a);
         }
     }
 }
