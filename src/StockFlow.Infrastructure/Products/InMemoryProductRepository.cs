@@ -43,4 +43,52 @@ public sealed class InMemoryProductRepository : IProductRepository
         // IReadOnlyList<ProductResponse> products = _products;
         return Task.FromResult(p);
     }
+
+    public Task<ProductResponse?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var p = new ProductResponse(
+            Guid.NewGuid(),
+            "Mechanical Keyboard",
+            "A mechanical keyboard",
+            2990m,
+            true
+        );
+
+        return Task.FromResult(p);
+    }
+
+    public Task<ProductResponse> CreateAsync(
+        CreateProductRequest request,
+        CancellationToken cancellationToken)
+    {
+        ProductResponse product = new(
+            Guid.NewGuid(),
+            request.Name,
+            request.Description,
+            request.Price,
+            true
+        );
+
+        return Task.FromResult(product);
+    }
+
+    public Task<ProductResponse?> UpdateAsync(Guid id, UpdateProductRequest request, CancellationToken cancellationToken)
+    {
+        var p = new ProductResponse(
+            Guid.NewGuid(),
+            request.Name,
+            request.Description,
+            request.Price,
+            true
+        );
+
+        return Task.FromResult(p);
+    }
+
+    public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(true);
+    }
 }

@@ -17,4 +17,37 @@ public sealed class ProductService
         IReadOnlyList<ProductResponse> products = await _productRepository.GetAllAsync(cancellationToken);
         return products;
     }
+
+    public async Task<ProductResponse?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        ProductResponse? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+        return product;
+    }
+
+    public async Task<ProductResponse> CreateAsync(
+        CreateProductRequest request,
+        CancellationToken cancellationToken)
+    {
+        ProductResponse product = await _productRepository.CreateAsync(request, cancellationToken);
+        return product;
+    }
+
+    public async Task<ProductResponse?> UpdateAsync(
+        Guid id,
+        UpdateProductRequest request,
+        CancellationToken cancellationToken)
+    {
+        ProductResponse product = await _productRepository.UpdateAsync(id, request, cancellationToken);
+        return product;
+    }
+
+    public async Task<bool> DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        bool deleted = await _productRepository.DeleteAsync(id, cancellationToken);
+        return deleted;
+    }
 }
