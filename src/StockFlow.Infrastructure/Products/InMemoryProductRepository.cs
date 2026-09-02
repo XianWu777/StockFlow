@@ -1,3 +1,4 @@
+using StockFlow.Application.Common;
 using StockFlow.Application.Products;
 
 namespace StockFlow.Infrastructure.Products;
@@ -21,25 +22,11 @@ public sealed class InMemoryProductRepository : IProductRepository
         )
     ];
 
-    public Task<IReadOnlyList<ProductResponse>> GetAllAsync(
+    public Task<PagedResult<ProductResponse>> GetAllAsync(
+        GetProductsQuery query,
         CancellationToken cancellationToken)
     {
-        IReadOnlyList<ProductResponse> p = new List<ProductResponse> {
-            new (
-                Guid.NewGuid(),
-                "Mechanical Keyboard",
-                "A mechanical keyboard",
-                2990m,
-                true
-            ),
-            new (
-                Guid.NewGuid(),
-                "Gaming Mouse",
-                "A gaming mouse",
-                1590m,
-                true
-            )
-        };
+        PagedResult<ProductResponse> p = null;
         // IReadOnlyList<ProductResponse> products = _products;
         return Task.FromResult(p);
     }

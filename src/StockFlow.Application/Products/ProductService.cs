@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using StockFlow.Application.Common;
 
 namespace StockFlow.Application.Products;
 
@@ -11,10 +12,11 @@ public sealed class ProductService
         _productRepository = productRepository;
     }
 
-    public async Task<IReadOnlyList<ProductResponse>> GetAllAsync(
+    public async Task<PagedResult<ProductResponse>> GetAllAsync(
+        GetProductsQuery query,
         CancellationToken cancellationToken)
     {
-        IReadOnlyList<ProductResponse> products = await _productRepository.GetAllAsync(cancellationToken);
+        PagedResult<ProductResponse> products = await _productRepository.GetAllAsync(query, cancellationToken);
         return products;
     }
 

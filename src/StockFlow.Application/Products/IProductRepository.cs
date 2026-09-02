@@ -1,8 +1,11 @@
+using StockFlow.Application.Common;
+
 namespace StockFlow.Application.Products
 {
     public interface IProductRepository
     {
-        Task<IReadOnlyList<ProductResponse>> GetAllAsync(
+        Task<PagedResult<ProductResponse>> GetAllAsync(
+            GetProductsQuery query,
             CancellationToken cancellationToken);
 
         Task<ProductResponse?> GetByIdAsync(

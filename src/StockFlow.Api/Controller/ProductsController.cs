@@ -14,10 +14,17 @@ namespace StockFlow.Api.Controllers
             _productService = productService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetProducts()
+        [HttpGet("test-error")]
+        public IActionResult TestError()
         {
-            var a = await _productService.GetAllAsync(CancellationToken.None);
+            throw new Exception("This is a test exception.");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetProductsQuery query)
+        {
+            var a = await _productService.GetAllAsync(query, CancellationToken.None);
             return Ok(a);
         }
 
