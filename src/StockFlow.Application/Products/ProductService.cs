@@ -12,11 +12,18 @@ public sealed class ProductService
         _productRepository = productRepository;
     }
 
-    public async Task<PagedResult<ProductResponse>> GetAllAsync(
+    public async Task<IReadOnlyList<ProductResponse>> GetAllAsync(
+        CancellationToken cancellationToken)
+    {
+        var products = await _productRepository.GetAllAsync(cancellationToken);
+        return products;
+    }
+
+    public async Task<PagedResult<ProductResponse>> GetAllQueryAsync(
         GetProductsQuery query,
         CancellationToken cancellationToken)
     {
-        PagedResult<ProductResponse> products = await _productRepository.GetAllAsync(query, cancellationToken);
+        PagedResult<ProductResponse> products = await _productRepository.GetAllQueryAsync(query, cancellationToken);
         return products;
     }
 

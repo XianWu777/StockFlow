@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StockFlow.Infrastructure.Data;
@@ -11,9 +12,11 @@ using StockFlow.Infrastructure.Data;
 namespace StockFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(StockFlowDbContext))]
-    partial class StockFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260903144657_AddInventoryMovement")]
+    partial class AddInventoryMovement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,10 +39,6 @@ namespace StockFlow.Infrastructure.Data.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Version")
-                        .IsConcurrencyToken()
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -66,7 +65,8 @@ namespace StockFlow.Infrastructure.Data.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 

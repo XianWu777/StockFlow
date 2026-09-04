@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using StockFlow.Infrastructure.Entity;
+using StockFlow.Infrastructure.Inventories;
+using StockFlow.Infrastructure.Products;
 
 namespace StockFlow.Infrastructure.Data;
 
@@ -7,6 +8,7 @@ public class StockFlowDbContext : DbContext
 {
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
 
     public StockFlowDbContext(DbContextOptions<StockFlowDbContext> options)
             : base(options)
@@ -28,8 +30,28 @@ public class StockFlowDbContext : DbContext
         modelBuilder.Entity<Inventory>(entity =>
         {
             entity.HasKey(x => x.Id);
-            entity.HasOne(x => x.Product).WithOne().HasForeignKey<Inventory>(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasIndex(x => x.ProductId).IsUnique();
+
+            entity.Property(x => x.Version)
+                .IsConcurrencyToken();
+
+            entity.HasOne(x => x.Product)
+                .WithOne()
+                .HasForeignKey<Inventory>(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.ProductId)
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<InventoryMovement>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Type)
+                // .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(x => x.ProductId);
         });
     }
 }

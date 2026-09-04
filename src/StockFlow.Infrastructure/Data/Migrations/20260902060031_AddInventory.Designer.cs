@@ -25,7 +25,7 @@ namespace StockFlow.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Entity.Inventory", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace StockFlow.Infrastructure.Data.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Entity.Product", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,11 +81,11 @@ namespace StockFlow.Infrastructure.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Entity.Inventory", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Inventory", b =>
                 {
-                    b.HasOne("StockFlow.Infrastructure.Entity.Product", "Product")
+                    b.HasOne("StockFlow.Infrastructure.Inventory.Product", "Product")
                         .WithOne()
-                        .HasForeignKey("StockFlow.Infrastructure.Entity.Inventory", "ProductId")
+                        .HasForeignKey("StockFlow.Infrastructure.Inventory.Inventory", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

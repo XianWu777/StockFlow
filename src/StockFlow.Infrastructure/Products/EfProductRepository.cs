@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using StockFlow.Application.Common;
 using StockFlow.Application.Products;
 using StockFlow.Infrastructure.Data;
-using StockFlow.Infrastructure.Entity;
+using StockFlow.Infrastructure.Inventories;
 
 namespace StockFlow.Infrastructure.Products;
 
@@ -16,9 +16,25 @@ public class EfProductRepository : IProductRepository
         _dbContext = dbContext;
     }
 
-    public async Task<PagedResult<ProductResponse>> GetAllAsync(GetProductsQuery query, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<ProductResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("Try to GetAllAsync");
+        var products = _dbContext.Products.AsNoTracking();
+
+        var items = await products
+                        .Select(product => new ProductResponse(
+                            product.Id,
+                            product.Name,
+                            product.Description,
+                            product.Price,
+                            product.IsActive))
+                        .ToListAsync(cancellationToken);
+        return items;
+    }
+
+    public async Task<PagedResult<ProductResponse>> GetAllQueryAsync(GetProductsQuery query, CancellationToken cancellationToken)
+    {
+        Console.WriteLine("Try to GetAllQueryAsync");
 
         var products = _dbContext.Products
             .AsNoTracking();
@@ -136,7 +152,16 @@ public class EfProductRepository : IProductRepository
             UpdatedAt = DateTime.UtcNow
         };
 
+        Inventory inventory = new Inventory
+        {
+            Id = Guid.NewGuid(),
+            ProductId = product.Id,
+            Quantity = 0,
+            UpdatedAt = DateTime.UtcNow
+        };
+
         _dbContext.Products.Add(product);
+        _dbContext.Inventories.Add(inventory);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         Console.WriteLine($"Try to CreateAsync Product: {JsonConvert.SerializeObject(product)}");

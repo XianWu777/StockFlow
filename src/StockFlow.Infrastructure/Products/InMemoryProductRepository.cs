@@ -5,7 +5,7 @@ namespace StockFlow.Infrastructure.Products;
 
 public sealed class InMemoryProductRepository : IProductRepository
 {
-    private readonly List<ProductResponse> _products = [
+    private IReadOnlyList<ProductResponse> _products = [
         new (
             Guid.NewGuid(),
             "Mechanical Keyboard",
@@ -22,7 +22,12 @@ public sealed class InMemoryProductRepository : IProductRepository
         )
     ];
 
-    public Task<PagedResult<ProductResponse>> GetAllAsync(
+    public Task<IReadOnlyList<ProductResponse>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_products);
+    }
+
+    public Task<PagedResult<ProductResponse>> GetAllQueryAsync(
         GetProductsQuery query,
         CancellationToken cancellationToken)
     {

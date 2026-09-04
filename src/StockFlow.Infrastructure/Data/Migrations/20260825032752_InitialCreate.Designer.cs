@@ -25,7 +25,7 @@ namespace StockFlow.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Entity.Product", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

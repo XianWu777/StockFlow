@@ -1,4 +1,4 @@
-namespace StockFlow.Infrastructure.Entity;
+namespace StockFlow.Infrastructure.Products;
 
 public sealed class Product
 {
