@@ -5,10 +5,17 @@ namespace StockFlow.Application.Inventory;
 public sealed class InventoryService
 {
     private readonly IInventoryRepository _inventoryRepository;
+    private readonly IInventoryMovementRepository _inventoryMovementRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public InventoryService(IInventoryRepository inventoryRepository)
+    public InventoryService(
+        IInventoryRepository inventoryRepository,
+        IInventoryMovementRepository inventoryMovementRepository,
+        IUnitOfWork unitOfWork)
     {
         _inventoryRepository = inventoryRepository;
+        _inventoryMovementRepository = inventoryMovementRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IReadOnlyList<InventoryResponse>> GetAllAsync(CancellationToken cancellationToken)
@@ -39,15 +46,31 @@ public sealed class InventoryService
         StockOutRequest request,
         CancellationToken cancellationToken)
     {
-        int affectedRows =
-            await _inventoryRepository.StockOutAsync(
-                productId,
-                request,
-                cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        if (affectedRows == 0)
+        try
         {
-            throw new InsufficientInventoryException();
+            int affectedRows =
+                await _inventoryRepository.StockOutAsync(
+                    productId,
+                    request,
+                    cancellationToken);
+
+            if (affectedRows == 0)
+            {
+                Console.WriteLine($"Insufficient inventory for product: {productId}");
+                throw new InsufficientInventoryException();
+            }
+
+            var movement = new InventoryMovementDraft(productId, InventoryMovementType.Out, request.Quantity);
+            await _inventoryMovementRepository.AddAsync(movement, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
         }
     }
 }

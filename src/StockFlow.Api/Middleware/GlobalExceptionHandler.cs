@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StockFlow.Application.Inventory.Exceptions;
 
 namespace StockFlow.Api.Middleware;
 
@@ -28,6 +29,29 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 Extensions =
                     {
                         ["code"] = "CONCURRENCY_CONFLICT",
+                        ["traceId"] = httpContext.TraceIdentifier,
+                    }
+            };
+
+            await httpContext.Response.WriteAsJsonAsync(
+                problemDetails,
+                cancellationToken);
+
+            return true;
+        }
+        else if (exception is InsufficientInventoryException)
+        {
+            Console.WriteLine("Insufficient inventory exception occurred.");
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Insufficient Inventory",
+                Detail = "The inventory is insufficient for the requested operation.",
+                Extensions =
+                    {
+                        ["code"] = "INSUFFICIENT_INVENTORY",
                         ["traceId"] = httpContext.TraceIdentifier,
                     }
             };

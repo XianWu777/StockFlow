@@ -48,7 +48,6 @@ public class StockFlowDbContext : DbContext
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Type)
-                // .HasMaxLength(50)
                 .IsRequired();
 
             entity.HasIndex(x => x.ProductId);

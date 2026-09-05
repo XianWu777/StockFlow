@@ -70,7 +70,7 @@ public sealed class EfInventoryRepository : IInventoryRepository
             {
                 Id = Guid.NewGuid(),
                 ProductId = productId,
-                Type = "StockIn",
+                Type = InventoryMovementType.In,
                 Quantity = request.Quantity,
                 CreatedAt = DateTime.UtcNow
             };
