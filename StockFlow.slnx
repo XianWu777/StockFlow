@@ -5,6 +5,7 @@
     <Project Path="src/StockFlow.Infrastructure/StockFlow.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/StockFlow.Api.Tests/StockFlow.Api.Tests.csproj" />
     <Project Path="tests/StockFlow.Application.Tests/StockFlow.Application.Tests.csproj" />
   </Folder>
 </Solution>

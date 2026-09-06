@@ -17,7 +17,8 @@ public class ProductsController : ControllerBase
     [HttpGet("test-error")]
     public IActionResult TestError()
     {
-        throw new Exception("This is a test exception.");
+        // throw new Exception("This is a test exception.");
+        return Ok();
     }
 
     [HttpGet("GetAllAsync")]
@@ -51,6 +52,8 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Description = "Created")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Description = "Bad Request")]
     public async Task<IActionResult> CreateProducts(
             [FromBody] CreateProductRequest request,
             CancellationToken cancellationToken)
@@ -58,7 +61,7 @@ public class ProductsController : ControllerBase
         Console.WriteLine("Try to CreateProducts");
         var product = await _productService.CreateAsync(request, cancellationToken);
 
-        return Ok(product);
+        return StatusCode(StatusCodes.Status201Created, product);
     }
 
     [HttpPut("{id:guid}")]

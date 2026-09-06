@@ -42,11 +42,11 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         else if (exception is InsufficientInventoryException)
         {
             Console.WriteLine("Insufficient inventory exception occurred.");
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status409Conflict,
                 Title = "Insufficient Inventory",
                 Detail = "The inventory is insufficient for the requested operation.",
                 Extensions =
