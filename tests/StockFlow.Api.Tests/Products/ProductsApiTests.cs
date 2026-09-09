@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using StockFlow.Application.Authentication;
 using StockFlow.Application.Products;
 using Xunit;
 
@@ -37,7 +38,7 @@ public class ProductsApiTests
         var request = new
         {
             name = $"Integration Test {Guid.NewGuid()}",
-            description = "Created by integration test",
+            description = "Created by integration test product test",
             price = 99.99m,
         };
 
@@ -57,6 +58,8 @@ public class ProductsApiTests
     [Fact]
     public async Task CreateProduct_ThenGetProduct_ShouldReturnProduct()
     {
+        var token = await LoginAsync("admin", "admin");
+
         // Arrange
         var productName =
             $"Integration Test {Guid.NewGuid()}";
@@ -64,12 +67,13 @@ public class ProductsApiTests
         var request = new
         {
             name = productName,
-            description = "Created by integration test",
+            description = "Created by integration test product test",
             price = 99.99m,
         };
 
         using var content = JsonContent.Create(request);
 
+        _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
         // Act
         var createResponse = await _client.PostAsync(
             "/api/Products",
@@ -99,5 +103,25 @@ public class ProductsApiTests
 
         Assert.NotNull(product);
         Assert.Equal(productName, product!.Name);
+    }
+
+    private async Task<string> LoginAsync(string username, string password)
+    {
+        var loginRequest = new
+        {
+            username = username,
+            password = password
+        };
+
+        var response = await _client.PostAsJsonAsync(
+            "/api/auth/login",
+            loginRequest);
+
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content
+            .ReadFromJsonAsync<LoginResponse>();
+
+        return responseContent!.AccessToken;
     }
 }

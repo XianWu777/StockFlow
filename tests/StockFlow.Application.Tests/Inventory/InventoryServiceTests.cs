@@ -48,7 +48,7 @@ public class InventoryServiceTests
             x => x.AddAsync(
                 It.Is<InventoryMovementDraft>(m =>
                     m.ProductId == productId &&
-                    m.Type == InventoryMovementType.Out &&
+                    m.Type == InventoryMovementType.StockOut &&
                     m.Quantity == 5),
                 It.IsAny<CancellationToken>()),
             Times.Once);

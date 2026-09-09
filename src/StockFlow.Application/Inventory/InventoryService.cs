@@ -1,3 +1,4 @@
+using StockFlow.Application.Common;
 using StockFlow.Application.Inventory.Exceptions;
 
 namespace StockFlow.Application.Inventory;
@@ -26,7 +27,13 @@ public sealed class InventoryService
 
     public async Task<IReadOnlyList<InventoryMovementResponse>> GetMovementsAsync(CancellationToken cancellationToken)
     {
-        var inventorys = await _inventoryRepository.GetMovementsAsync(cancellationToken);
+        var inventorys = await _inventoryMovementRepository.GetAllAsync(cancellationToken);
+        return inventorys;
+    }
+
+    public async Task<PagedResult<InventoryMovementResponse>> GetMovementsByProductIdAsync(Guid productId, GetInventoryMovementsQuery query, CancellationToken cancellationToken)
+    {
+        var inventorys = await _inventoryMovementRepository.GetByQueryAsync(productId, query, cancellationToken);
         return inventorys;
     }
 
@@ -62,7 +69,7 @@ public sealed class InventoryService
                 throw new InsufficientInventoryException();
             }
 
-            var movement = new InventoryMovementDraft(productId, InventoryMovementType.Out, request.Quantity);
+            var movement = new InventoryMovementDraft(productId, InventoryMovementType.StockOut, request.Quantity);
             await _inventoryMovementRepository.AddAsync(movement, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockFlow.Application.Products;
+using StockFlow.Infrastructure.Data;
 
 namespace StockFlow.Api.Controllers;
 
@@ -8,17 +10,13 @@ namespace StockFlow.Api.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _productService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ProductsController(ProductService productService)
+    public ProductsController(ProductService productService,
+        IUnitOfWork unitOfWork)
     {
         _productService = productService;
-    }
-
-    [HttpGet("test-error")]
-    public IActionResult TestError()
-    {
-        // throw new Exception("This is a test exception.");
-        return Ok();
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet("GetAllAsync")]
@@ -52,19 +50,20 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    // [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created, Description = "Created")]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Description = "Bad Request")]
-    public async Task<IActionResult> CreateProducts(
+    public async Task<IActionResult> Create(
             [FromBody] CreateProductRequest request,
             CancellationToken cancellationToken)
     {
-        Console.WriteLine("Try to CreateProducts");
         var product = await _productService.CreateAsync(request, cancellationToken);
 
         return StatusCode(StatusCodes.Status201Created, product);
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(
         Guid id,
         UpdateProductRequest request,
@@ -81,6 +80,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(
         Guid id,
         CancellationToken cancellationToken)

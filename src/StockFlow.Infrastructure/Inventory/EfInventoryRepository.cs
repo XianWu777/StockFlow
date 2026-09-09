@@ -52,6 +52,7 @@ public sealed class EfInventoryRepository : IInventoryRepository
 
         if (inventory is null)
         {
+            Console.WriteLine($"Inventory not found for product {productId}");
             throw new KeyNotFoundException($"Inventory not found for product {productId}");
         }
 
@@ -70,7 +71,7 @@ public sealed class EfInventoryRepository : IInventoryRepository
             {
                 Id = Guid.NewGuid(),
                 ProductId = productId,
-                Type = InventoryMovementType.In,
+                Type = InventoryMovementType.StockIn,
                 Quantity = request.Quantity,
                 CreatedAt = DateTime.UtcNow
             };
@@ -84,6 +85,7 @@ public sealed class EfInventoryRepository : IInventoryRepository
         {
             Console.WriteLine("StockIn ConcurrencyException");
             await transaction.RollbackAsync(cancellationToken);
+            throw;
         }
         catch (Exception)
         {

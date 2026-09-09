@@ -5,7 +5,7 @@
 namespace StockFlow.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class udpateVersion : Migration
+    public partial class AddInventoryMovementQueryIndex2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

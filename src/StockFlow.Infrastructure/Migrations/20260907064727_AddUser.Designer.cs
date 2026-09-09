@@ -9,11 +9,11 @@ using StockFlow.Infrastructure.Data;
 
 #nullable disable
 
-namespace StockFlow.Infrastructure.Data.Migrations
+namespace StockFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(StockFlowDbContext))]
-    [Migration("20260902060031_AddInventory")]
-    partial class AddInventory
+    [Migration("20260907064727_AddUser")]
+    partial class AddUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace StockFlow.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Inventory", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventories.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -40,6 +40,10 @@ namespace StockFlow.Infrastructure.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId")
@@ -48,7 +52,32 @@ namespace StockFlow.Infrastructure.Data.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Product", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventories.InventoryMovement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("InventoryMovements");
+                });
+
+            modelBuilder.Entity("StockFlow.Infrastructure.Products.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,11 +110,42 @@ namespace StockFlow.Infrastructure.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("StockFlow.Infrastructure.Inventory.Inventory", b =>
+            modelBuilder.Entity("StockFlow.Infrastructure.Users.User", b =>
                 {
-                    b.HasOne("StockFlow.Infrastructure.Inventory.Product", "Product")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("StockFlow.Infrastructure.Inventories.Inventory", b =>
+                {
+                    b.HasOne("StockFlow.Infrastructure.Products.Product", "Product")
                         .WithOne()
-                        .HasForeignKey("StockFlow.Infrastructure.Inventory.Inventory", "ProductId")
+                        .HasForeignKey("StockFlow.Infrastructure.Inventories.Inventory", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

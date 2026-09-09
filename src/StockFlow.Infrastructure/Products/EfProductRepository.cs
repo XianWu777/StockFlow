@@ -29,6 +29,8 @@ public class EfProductRepository : IProductRepository
                             product.Price,
                             product.IsActive))
                         .ToListAsync(cancellationToken);
+
+        Console.WriteLine($"Try to GetAllAsync : {JsonConvert.SerializeObject(items)}");
         return items;
     }
 
@@ -139,8 +141,6 @@ public class EfProductRepository : IProductRepository
 
     public async Task<ProductResponse> CreateAsync(CreateProductRequest request, CancellationToken cancellationToken)
     {
-        Console.WriteLine("Try to CreateAsync");
-
         var product = new Product
         {
             Id = Guid.NewGuid(),
@@ -163,8 +163,6 @@ public class EfProductRepository : IProductRepository
         _dbContext.Products.Add(product);
         _dbContext.Inventories.Add(inventory);
         await _dbContext.SaveChangesAsync(cancellationToken);
-
-        Console.WriteLine($"Try to CreateAsync Product: {JsonConvert.SerializeObject(product)}");
 
         return new ProductResponse(
             product.Id,

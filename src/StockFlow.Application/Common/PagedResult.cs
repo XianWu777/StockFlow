@@ -7,5 +7,5 @@ public sealed record PagedResult<T>(
     int TotalCount)
 {
     public int TotalPages =>
-        (int)Math.Ceiling((double)Page / PageSize);
+        (int)Math.Ceiling((double)TotalCount / PageSize);
 }

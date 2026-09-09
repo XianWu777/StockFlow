@@ -29,7 +29,7 @@ public sealed class EfUnitOfWork : IUnitOfWork
 
     public async Task RollbackAsync(CancellationToken cancellationToken)
     {
-        if(_dbContext.Database.CurrentTransaction is not null)
+        if (_dbContext.Database.CurrentTransaction is not null)
         {
             await _dbContext.Database.RollbackTransactionAsync(cancellationToken);
         }
