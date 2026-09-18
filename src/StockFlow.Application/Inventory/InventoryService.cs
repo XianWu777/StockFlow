@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using StockFlow.Application.Common;
 using StockFlow.Application.Inventory.Exceptions;
 
@@ -8,15 +9,18 @@ public sealed class InventoryService
     private readonly IInventoryRepository _inventoryRepository;
     private readonly IInventoryMovementRepository _inventoryMovementRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<InventoryService> _logger;
 
     public InventoryService(
         IInventoryRepository inventoryRepository,
         IInventoryMovementRepository inventoryMovementRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ILogger<InventoryService> logger)
     {
         _inventoryRepository = inventoryRepository;
         _inventoryMovementRepository = inventoryMovementRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<InventoryResponse>> GetAllAsync(CancellationToken cancellationToken)
@@ -65,7 +69,11 @@ public sealed class InventoryService
 
             if (affectedRows == 0)
             {
-                Console.WriteLine($"Insufficient inventory for product: {productId}");
+                _logger.LogWarning(
+                    "Stock out rejected due to insufficient inventory. ProductId: {ProductId}, Quantity: {Quantity}",
+                    productId,
+                    request.Quantity);
+
                 throw new InsufficientInventoryException();
             }
 
@@ -73,6 +81,11 @@ public sealed class InventoryService
             await _inventoryMovementRepository.AddAsync(movement, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "StockOut succeeded. ProductId: {ProductId}, Quantity: {Quantity}",
+                productId,
+                request.Quantity);
         }
         catch
         {

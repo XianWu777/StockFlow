@@ -46,9 +46,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddSwaggerGen(c =>
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" })
-    );
+builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" }));
+builder.Services.AddHealthChecks().AddDbContextCheck<StockFlowDbContext>();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // 有transient, scoped, singleton分別
 builder.Services.AddSingleton(jwtOptions);
@@ -88,16 +89,13 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()
+    || app.Environment.IsEnvironment("Docker"))
 {
-    app.MapOpenApi();
     app.UseSwagger();
-
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    }
-    );
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
+    app.UseHttpsRedirection();
+    app.MapOpenApi();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -105,6 +103,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<StockFlowDbContext>();
     var passwordHasher = services.GetRequiredService<IPasswordHasher>();
+    await dbContext.Database.MigrateAsync();
 
     await AdminSeeder.SeedAsync(
         dbContext,
@@ -113,10 +112,12 @@ using (var scope = app.Services.CreateScope())
 
 // customize the application configuration
 app.UseExceptionHandler();
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
 
